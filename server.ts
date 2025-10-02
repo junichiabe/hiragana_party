@@ -32,8 +32,8 @@ const MAX_PLAYERS = 40;
 
 // コード整形
 function sanitizeRoomCode(raw: unknown): string {
-  if (typeof raw !== 'string') return '';
-  const trimmed = raw.trim();
+  if (typeof raw !== 'string' && typeof raw !== 'number') return '';
+  const trimmed = String(raw).trim();
   return /^\d{6}$/.test(trimmed) ? trimmed : '';
 }
 

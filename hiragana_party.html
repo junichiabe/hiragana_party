@@ -1410,8 +1410,8 @@
         }
 
         sanitizeRoomCode(code) {
-            if (typeof code !== 'string') return '';
-            const trimmed = code.trim();
+            if (typeof code !== 'string' && typeof code !== 'number') return '';
+            const trimmed = String(code).trim();
             return /^\d{6}$/.test(trimmed) ? trimmed : '';
         }
 
