@@ -1410,8 +1410,11 @@
         }
 
         sanitizeRoomCode(code) {
-            if (typeof code !== 'string') return '';
-            return String(code).replace(/[^0-9]/g, '').slice(0, 6);
+            if (code == null) return '';
+            const normalized = String(code).replace(/[０-９]/g, (digit) =>
+                String.fromCharCode(digit.charCodeAt(0) - 0xff10 + 0x30)
+            );
+            return normalized.replace(/[^0-9]/g, '').slice(0, 6);
         }
 
         setQuestionCount(count) {

@@ -32,8 +32,11 @@ const MAX_PLAYERS = 40;
 
 // コード整形
 function sanitizeRoomCode(raw: unknown): string {
-  if (typeof raw !== 'string') return '';
-  return raw.replace(/\D/g, '').slice(0, 6);
+  if (raw == null) return '';
+  const normalized = String(raw).replace(/[０-９]/g, (digit) =>
+    String.fromCharCode(digit.charCodeAt(0) - 0xff10 + 0x30)
+  );
+  return normalized.replace(/\D/g, '').slice(0, 6);
 }
 
 // ルームコード生成（6桁数字）
