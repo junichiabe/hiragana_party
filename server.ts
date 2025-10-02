@@ -33,9 +33,13 @@ const MAX_PLAYERS = 40;
 // コード整形
 function sanitizeRoomCode(raw: unknown): string {
   if (raw == null) return '';
-  const normalized = String(raw).replace(/[０-９]/g, (digit) =>
-    String.fromCharCode(digit.charCodeAt(0) - 0xff10 + 0x30)
-  );
+  let normalized = String(raw);
+  try {
+    normalized = normalized.normalize('NFKC');
+  } catch (_) {
+    // normalize unavailable; fall back without it
+  }
+  normalized = normalized.replace(/[〇]/g, '0');
   return normalized.replace(/\D/g, '').slice(0, 6);
 }
 
