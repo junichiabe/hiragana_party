@@ -30,14 +30,20 @@ const rooms = new Map<string, Room>();
 const playerToRoom = new Map<string, string>();
 const MAX_PLAYERS = 40;
 
-// ルームコード生成（6桁英数字）
+// コード整形
+function sanitizeRoomCode(raw: unknown): string {
+  if (typeof raw !== 'string') return '';
+  return raw.replace(/\D/g, '').slice(0, 6);
+}
+
+// ルームコード生成（6桁数字）
 function generateRoomCode(): string {
-  const chars = '0123456789';
+  const digits = '0123456789';
   let code = '';
   for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
+    code += digits.charAt(Math.floor(Math.random() * digits.length));
   }
-  return code;
+  return sanitizeRoomCode(code); // 念のため整形
 }
 
 // ホストキー生成
@@ -294,16 +300,24 @@ async function handleWebSocket(request: Request): Promise<Response> {
         case 'join': {
           // ルーム参加
           const { code, name, clientId, isHost } = data;
-          const success = joinRoom(code, clientId, name, socket, isHost || false);
+          const normalizedCode = sanitizeRoomCode(code);
+          if (normalizedCode.length !== 6) {
+            socket.send(JSON.stringify({
+              type: 'error',
+              message: '6桁の数字コードを入力してください'
+            }));
+            break;
+          }
+          const success = joinRoom(normalizedCode, clientId, name, socket, isHost || false);
           if (success) {
             playerId = clientId;
             socket.send(JSON.stringify({
               type: 'joined',
               playerId: clientId,
-              code
+              code: normalizedCode
             }));
 
-            const room = rooms.get(code);
+            const room = rooms.get(normalizedCode);
             if (room) {
               socket.send(JSON.stringify({
                 type: 'state',
