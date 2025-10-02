@@ -1410,15 +1410,9 @@
         }
 
         sanitizeRoomCode(code) {
-            if (code == null) return '';
-            let normalized = String(code);
-            try {
-                normalized = normalized.normalize('NFKC');
-            } catch (_) {
-                // normalize が未対応の場合はそのまま進む
-            }
-            normalized = normalized.replace(/[〇]/g, '0');
-            return normalized.replace(/[^0-9]/g, '').slice(0, 6);
+            if (typeof code !== 'string') return '';
+            const trimmed = code.trim();
+            return /^\d{6}$/.test(trimmed) ? trimmed : '';
         }
 
         setQuestionCount(count) {

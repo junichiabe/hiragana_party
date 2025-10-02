@@ -32,15 +32,9 @@ const MAX_PLAYERS = 40;
 
 // コード整形
 function sanitizeRoomCode(raw: unknown): string {
-  if (raw == null) return '';
-  let normalized = String(raw);
-  try {
-    normalized = normalized.normalize('NFKC');
-  } catch (_) {
-    // normalize unavailable; fall back without it
-  }
-  normalized = normalized.replace(/[〇]/g, '0');
-  return normalized.replace(/\D/g, '').slice(0, 6);
+  if (typeof raw !== 'string') return '';
+  const trimmed = raw.trim();
+  return /^\d{6}$/.test(trimmed) ? trimmed : '';
 }
 
 // ルームコード生成（6桁数字）
